@@ -1,0 +1,939 @@
+/* ═══════════════════════════════════════════════════════════════
+   NEURAL ECHO — Tactical Sci-Fi HUD Design System (Stage 2)
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Required Five-Color Foundation */
+  --bg-prussian-blue: #0E142E;
+  --panel-jet-black:   #202C3A;
+  --accent-yale-blue:  #184375;
+  --inset-black:       #000000;
+  --hover-yale-blue-2: #194373;
+
+  /* Supporting Neutrals */
+  --text-primary:      #f0f4f8;
+  --text-muted:        #8a99ad;
+
+  /* Accent highlights & Tactical Glows */
+  --glow-cyan:         rgba(56, 189, 248, 0.45);
+  --border-subtle:     rgba(24, 67, 117, 0.45);
+  --border-bright:     rgba(56, 189, 248, 0.6);
+  --alert-red:         #ef4444;
+  --alert-red-glow:    rgba(239, 68, 68, 0.4);
+  --success-emerald:   #10b981;
+
+  /* Node Tactical Colors (restrained tactical accents matching HUD) */
+  --tile-0-base: #064e3b;
+  --tile-0-glow: #10b981;
+  --tile-1-base: #7f1d1d;
+  --tile-1-glow: #ef4444;
+  --tile-2-base: #713f12;
+  --tile-2-glow: #f59e0b;
+  --tile-3-base: #1e3a8a;
+  --tile-3-glow: #38bdf8;
+}
+
+/* ── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  min-height: 100vh;
+  width: 100%;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-prussian-blue);
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(24, 67, 117, 0.35) 0%, transparent 75%),
+    linear-gradient(rgba(14, 20, 46, 0.95), rgba(14, 20, 46, 0.98)),
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.25) 2px, rgba(0, 0, 0, 0.25) 4px);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, monospace, sans-serif;
+  color: var(--text-primary);
+  padding: 1.5rem;
+  overflow-x: hidden;
+}
+
+/* ── Utility ─────────────────────────────────────────────── */
+.hidden {
+  display: none !important;
+}
+
+/* ── Main HUD Container ───────────────────────────────────── */
+.hud-container {
+  width: 100%;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+}
+
+/* ── Tactical Header & Branding ──────────────────────────── */
+.hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.4rem;
+  background: var(--panel-jet-black);
+  border: 1px solid var(--accent-yale-blue);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.hud-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.hud-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+
+.hud-subtitle {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.hud-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--inset-black);
+  border: 1px solid var(--accent-yale-blue);
+  color: var(--text-primary);
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: var(--hover-yale-blue-2);
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+.icon-btn:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
+.icon-btn.muted {
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+}
+
+.icon-btn.muted:hover {
+  border-color: var(--alert-red);
+  box-shadow: 0 0 10px var(--alert-red-glow);
+}
+
+.audio-icon {
+  display: block;
+}
+
+.audio-label {
+  user-select: none;
+}
+
+.hud-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  background: var(--inset-black);
+  border: 1px solid var(--hover-yale-blue-2);
+  border-radius: 6px;
+}
+
+.status-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success-emerald);
+  box-shadow: 0 0 8px var(--success-emerald);
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.status-indicator-text {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+  font-family: monospace;
+}
+
+/* ── Screen Containers ───────────────────────────────────── */
+.screen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ── Tactical Panels ─────────────────────────────────────── */
+.hud-panel {
+  background: var(--panel-jet-black);
+  border: 1px solid var(--accent-yale-blue);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.55rem 1.2rem;
+  background: var(--inset-black);
+  border-bottom: 1px solid var(--accent-yale-blue);
+  font-family: monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+}
+
+.panel-tag {
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.panel-tag.warning-tag {
+  color: var(--alert-red);
+}
+
+.panel-decor {
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  background: rgba(24, 67, 117, 0.4);
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+}
+
+.menu-content {
+  padding: 2rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+  text-align: center;
+}
+
+.menu-heading {
+  font-size: 1.15rem;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.menu-desc {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  max-width: 420px;
+}
+
+.difficulty-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.field-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  font-family: monospace;
+  text-align: left;
+}
+
+/* ── Difficulty Buttons ──────────────────────────────────── */
+.difficulty-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.diff-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  padding: 0.85rem 0.5rem;
+  background: var(--inset-black);
+  border: 1px solid var(--accent-yale-blue);
+  border-radius: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+}
+
+.btn-tier {
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+}
+
+.btn-sub {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  font-family: monospace;
+  opacity: 0.75;
+}
+
+.diff-btn:hover {
+  background: var(--hover-yale-blue-2);
+  border-color: #38bdf8;
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.diff-btn.selected {
+  background: var(--accent-yale-blue);
+  border-color: #38bdf8;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(24, 67, 117, 0.75), inset 0 0 10px rgba(56, 189, 248, 0.2);
+}
+
+.diff-btn.selected .btn-sub {
+  color: #bae6fd;
+  opacity: 1;
+}
+
+.difficulty-description {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--inset-black);
+  border-left: 3px solid var(--accent-yale-blue);
+  border-radius: 0 6px 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+}
+
+.desc-prefix {
+  font-family: monospace;
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+#diff-desc {
+  color: var(--text-primary);
+  font-family: monospace;
+}
+
+/* ── Primary Tactical Button ─────────────────────────────── */
+.primary-btn {
+  position: relative;
+  width: 100%;
+  padding: 0.95rem 1.5rem;
+  background: var(--accent-yale-blue);
+  border: 1px solid #38bdf8;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.primary-btn:hover {
+  background: var(--hover-yale-blue-2);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+  transform: translateY(-1px);
+}
+
+.primary-btn:active {
+  transform: translateY(0);
+  background: #12345e;
+}
+
+/* ── Secondary Buttons & Reset Actions ─────────────────────── */
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.menu-secondary-actions {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.secondary-btn {
+  background: transparent;
+  border: 1px solid rgba(24, 67, 117, 0.8);
+  color: var(--text-muted);
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.secondary-btn:hover {
+  color: var(--text-primary);
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.secondary-btn:active {
+  transform: translateY(1px);
+}
+
+.toast-notify {
+  font-family: monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+  text-align: center;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── HUD Dashboard Cards ─────────────────────────────────── */
+.hud-dashboard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.hud-card {
+  background: var(--panel-jet-black);
+  border: 1px solid var(--accent-yale-blue);
+  border-radius: 8px;
+  padding: 0.65rem 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.hud-card-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  font-family: monospace;
+  text-align: center;
+}
+
+.hud-card-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: monospace;
+}
+
+.hud-card-value.highlight-gold {
+  color: #fbbf24;
+}
+
+.hud-card-value.badge {
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+  color: #38bdf8;
+}
+
+/* New record pill animation */
+.record-pill {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #f59e0b;
+  color: #000;
+  font-family: monospace;
+  font-size: 0.5rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  padding: 1px 4px;
+  border-radius: 3px;
+  animation: pulseGold 1s infinite alternate;
+}
+
+@keyframes pulseGold {
+  from { box-shadow: 0 0 4px rgba(245, 158, 11, 0.6); }
+  to { box-shadow: 0 0 10px rgba(245, 158, 11, 1); }
+}
+
+.hud-card.new-record-flash {
+  border-color: #fbbf24;
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+}
+
+/* ── HUD Status Line & Pause Controls ─────────────────────── */
+.hud-status-tracker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.status-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.status-line-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  background: var(--panel-jet-black);
+  border: 1px solid rgba(24, 67, 117, 0.7);
+  border-radius: 6px;
+  min-height: 42px;
+}
+
+.pause-toggle-btn {
+  background: var(--panel-jet-black);
+  border: 1px solid var(--accent-yale-blue);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 0.55rem 0.85rem;
+  font-family: monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+  height: 42px;
+}
+
+.pause-toggle-btn:hover {
+  color: #38bdf8;
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.pause-toggle-btn:active {
+  transform: translateY(1px);
+}
+
+.terminal-prompt {
+  color: #38bdf8;
+  font-family: monospace;
+  font-weight: 700;
+}
+
+#status-message {
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+  font-family: monospace;
+}
+
+#timer-bar-container {
+  width: 100%;
+}
+
+.timer-track {
+  width: 100%;
+  height: 6px;
+  background: var(--inset-black);
+  border: 1px solid var(--accent-yale-blue);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+#timer-bar {
+  height: 100%;
+  width: 100%;
+  background: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+  border-radius: 2px;
+}
+
+#timer-bar.warning {
+  background: var(--alert-red);
+  box-shadow: 0 0 10px var(--alert-red-glow);
+}
+
+/* ── 2×2 Tactical Tile Grid ───────────────────────────────── */
+.board-wrapper {
+  width: 100%;
+  padding: 1rem;
+  background: var(--panel-jet-black);
+  border: 1px solid var(--accent-yale-blue);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: min(440px, 100%);
+  aspect-ratio: 1 / 1;
+}
+
+/* ── Tile Styling & Transitions ───────────────────────────── */
+.tile {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border: 2px solid var(--accent-yale-blue);
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  background-color: var(--inset-black);
+  overflow: hidden;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 0.6rem;
+}
+
+.tile-corner-tag {
+  font-size: 0.6rem;
+  font-family: monospace;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+}
+
+.tile:hover {
+  border-color: #38bdf8;
+  transform: scale(1.015);
+}
+
+.tile:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 3px;
+}
+
+/* Tile Colors & Inset styling */
+.tile-0 {
+  background: radial-gradient(circle at center, rgba(16, 185, 129, 0.18) 0%, var(--inset-black) 85%);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.tile-1 {
+  background: radial-gradient(circle at center, rgba(239, 68, 68, 0.18) 0%, var(--inset-black) 85%);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.tile-2 {
+  background: radial-gradient(circle at center, rgba(245, 158, 11, 0.18) 0%, var(--inset-black) 85%);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.tile-3 {
+  background: radial-gradient(circle at center, rgba(56, 189, 248, 0.18) 0%, var(--inset-black) 85%);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+/* Tile Active / Flash Glow States */
+.tile.active {
+  transform: scale(0.97);
+  filter: brightness(1.6);
+}
+
+.tile-0.active {
+  background: #10b981;
+  border-color: #6ee7b7;
+  box-shadow: 0 0 35px rgba(16, 185, 129, 0.8), inset 0 0 15px #ffffff;
+}
+
+.tile-1.active {
+  background: #ef4444;
+  border-color: #fca5a5;
+  box-shadow: 0 0 35px rgba(239, 68, 68, 0.8), inset 0 0 15px #ffffff;
+}
+
+.tile-2.active {
+  background: #f59e0b;
+  border-color: #fde68a;
+  box-shadow: 0 0 35px rgba(245, 158, 11, 0.8), inset 0 0 15px #ffffff;
+}
+
+.tile-3.active {
+  background: #38bdf8;
+  border-color: #bae6fd;
+  box-shadow: 0 0 35px rgba(56, 189, 248, 0.8), inset 0 0 15px #ffffff;
+}
+
+.tile.active .tile-corner-tag {
+  color: #000;
+  font-weight: 900;
+}
+
+/* ── Tactical Game Over Modal Overlay ─────────────────────── */
+#game-over {
+  position: fixed;
+  inset: 0;
+  background: rgba(14, 20, 46, 0.88);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1.5rem;
+}
+
+.game-over-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--panel-jet-black);
+  border: 1px solid var(--alert-red);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 30px var(--alert-red-glow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.game-over-card .panel-header {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.game-over-card h2 {
+  font-size: 1.6rem;
+  letter-spacing: 0.15em;
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.game-over-reason {
+  color: #fca5a5;
+  font-family: monospace;
+  font-size: 0.88rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.hud-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.stat-box {
+  background: var(--inset-black);
+  border: 1px solid var(--accent-yale-blue);
+  border-radius: 6px;
+  padding: 0.65rem 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  position: relative;
+}
+
+.stat-box .record-pill {
+  top: -6px;
+  right: -3px;
+}
+
+/* ── Tactical Pause Modal Overlay ─────────────────────────── */
+.pause-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(14, 20, 46, 0.88);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 120;
+  padding: 1.5rem;
+}
+
+.pause-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--panel-jet-black);
+  border: 1px solid #38bdf8;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  gap: 1.2rem;
+  text-align: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.pause-card .panel-header {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.pause-title {
+  font-size: 1.5rem;
+  letter-spacing: 0.15em;
+  color: #ffffff;
+  font-weight: 900;
+  margin: 0;
+}
+
+.pause-desc {
+  color: var(--text-muted);
+  font-family: monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  padding: 0 0.5rem;
+}
+
+.pause-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.pause-actions .primary-btn {
+  margin-top: 0.5rem;
+}
+
+.stat-box-label {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  font-family: monospace;
+}
+
+.stat-box-value {
+  font-size: 1.25rem;
+  font-family: monospace;
+  color: var(--text-primary);
+}
+
+/* ── Tile Error Visual Feedback ────────────────────────────── */
+.tile.error-flash {
+  border-color: var(--alert-red) !important;
+  box-shadow: 0 0 35px var(--alert-red-glow), inset 0 0 20px rgba(239, 68, 68, 0.7) !important;
+  animation: shake 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+  40%, 60% { transform: translate3d(3px, 0, 0); }
+}
+
+/* ── Accessibility & Reduced Motion ───────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .tile:hover,
+  .tile.active,
+  .diff-btn:hover,
+  .primary-btn:hover {
+    transform: none !important;
+  }
+}
+
+/* ── Responsive adjustments ──────────────────────────────── */
+@media (max-width: 480px) {
+  body {
+    padding: 0.75rem;
+  }
+
+  .hud-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .hud-header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .hud-title {
+    font-size: 1.3rem;
+  }
+
+  .hud-dashboard {
+    gap: 0.4rem;
+  }
+
+  .hud-card-value {
+    font-size: 1.1rem;
+  }
+
+  .board {
+    gap: 10px;
+  }
+}
